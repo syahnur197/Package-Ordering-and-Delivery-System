@@ -8,11 +8,14 @@
         {% endblock %}
     </head>
     <body class="antialiased font-sans bg-gray-200">
-        <div class="container mx-auto px-4 sm:px-8">
-            {% block body %}{% endblock %}
-            {% block javascripts %}
-            {{ encore_entry_script_tags('app') }}
-            {% endblock %}
+        <div class="flex flex-row">
+            {{ include('partials/_sidebar.html.twig') }}
+            <div class="main-content flex-1 mx-auto px-8 py-20">
+                {% block body %}{% endblock %}
+                {% block javascripts %}
+                {{ encore_entry_script_tags('app') }}
+                {% endblock %}
+            </div>
         </div>
     </body>
 </html>
