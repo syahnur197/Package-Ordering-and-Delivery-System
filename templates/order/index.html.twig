@@ -1,0 +1,99 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}All Orders{% endblock %}
+
+{% block body %}
+
+
+<div class="py-8">
+  <div>
+    <h2 class="text-2xl font-semibold leading-tight">All Orders</h2>
+  </div>
+  <div class="-mx-4 sm:-mx-8 px-4 sm:px-8 py-4 overflow-x-auto">
+    <div class="inline-block min-w-full shadow rounded-lg overflow-hidden">
+      <table class="min-w-full leading-normal">
+        <thead>
+          <tr>
+            <th class="{{ header_class }}">
+              ID
+            </th>
+            <th class="{{ header_class }}">
+              Customer
+            </th>
+            <th class="{{ header_class }}">
+              Address
+            </th>
+            <th class="{{ header_class }}">
+              Deliverer
+            </th>
+            <th class="{{ header_class }}">
+              Deliver On
+            </th>
+            <th class="{{ header_class }}">
+              Deliver At
+            </th>
+            <th class="{{ header_class }}">
+              Status
+            </th>
+            <th class="{{ header_class }}">
+              Action
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for order in orders %}
+          <tr>
+            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+              <p class="text-gray-900 whitespace-no-wrap">
+                {{ order.id }}
+              </p>
+            </td>
+            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+              <p class="text-gray-900 whitespace-no-wrap">
+                {{ order.user.username }}
+              </p>
+            </td>
+            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+              <p class="text-gray-900 whitespace-no-wrap">
+                {{ order.address }}
+              </p>
+            </td>
+            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+              <p class="text-gray-900 whitespace-no-wrap">
+                {{ order.deliverer ? order.deliverer.name : '' }}
+              </p>
+            </td>
+            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+              <p class="text-gray-900 whitespace-no-wrap">
+                {{ order.deliverOn ? order.deliverOn|date('Y-m-d H:i:s') : '' }}
+              </p>
+            </td>
+            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+              <p class="text-gray-900 whitespace-no-wrap">
+                {{ order.deliverAt ? order.deliverAt|date('Y-m-d H:i:s') : '' }}
+              </p>
+            </td>
+            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+              <p class="text-gray-900 whitespace-no-wrap">
+                <span
+                  class="relative inline-block px-3 py-1 font-semibold text-{{ order.getStatusColour() }}-900 leading-tight">
+                  <span aria-hidden
+                    class="absolute inset-0 bg-{{ order.getStatusColour() }}-200 opacity-50 rounded-full"></span>
+                  <span class="relative">{{ order.status }}</span>
+                </span>
+              </p>
+            </td>
+            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+              <a class='text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded'
+                href="{{ path('order_show', {'id': order.id}) }}">Show</a>
+              <a class='text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded'
+                href="{{ path('order_edit', {'id': order.id}) }}">Edit</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
