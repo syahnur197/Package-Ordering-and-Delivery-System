@@ -149,6 +149,21 @@ class Order
         return $this;
     }
 
+    public function isPending() : bool
+    {
+        return $this->status === self::STATUS_PENDING;
+    }
+
+    public function isAccepted() : bool
+    {
+        return $this->status === self::STATUS_ACCEPTED;
+    }
+
+    public function isDelivered() : bool
+    {
+        return $this->status === self::STATUS_DELIVERED;
+    }
+
     public function getStatusColour(): ?string
     {
         return self::STATUS_COLOURS[$this->status];

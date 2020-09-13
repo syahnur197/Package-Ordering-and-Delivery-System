@@ -35,11 +35,11 @@ class OrderController extends AbstractController
             $orders = $orderRepository->findAll();
         } else if ($user->isDriver()) {
             $orders = $orderRepository->findBy([
-                'deliverer_id' => $user->id,
+                'deliverer' => $user,
             ]);
         } else if ($user->isCustomer()) {
             $orders = $orderRepository->findBy([
-                'user_id' => $user->id,
+                'user' => $user,
             ]);
         }
 
@@ -96,6 +96,21 @@ class OrderController extends AbstractController
      */
     public function edit(Request $request, Order $order, UserRepository $userRepository): Response
     {
+        /** @var \App\Entity\User $user */
+        $user = $this->getUser();
+
+        if (!$user->isAdmin()) {
+            $this->addFlash('error', 'You are not allowed to process this order!');
+
+            return $this->redirectToRoute('order_index');
+        }
+
+        if (!$order->isPending()) {
+            $this->addFlash('error', 'This order is not pending!');
+
+            return $this->redirectToRoute('order_index');
+        }
+
         $deliverers = $userRepository->findByRole(User::ROLE_DRIVER);
 
         return $this->render('order/edit.html.twig', [
@@ -110,12 +125,56 @@ class OrderController extends AbstractController
     /**
      * @Route("/{id}", name="order_update", methods={"PATCH"})
      */
-    public function update(Request $request, Order $order): Response
+    public function update(Request $request, Order $order, UserRepository $userRepository, EntityManagerInterface $manager): Response
     {
 
+        $token = $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('order_update' . $order->getId(), $token)) {
+            $this->addFlash('error', 'Invalid CSRF token!');
+
+            return $this->redirectToRoute('order_index');
+        }
+
+        $status = $request->get('status');
+        $deliverer_id = $request->get('deliverer_id');
+
+
+        $order->setStatus($status);
+
+        if ($status == Order::STATUS_ACCEPTED) {
+            $deliverer = $userRepository->find($deliverer_id);
+
+            $order->setDeliverer($deliverer);
+        }
+
+        $manager->persist($order);
+        $manager->flush();
 
         return $this->redirectToRoute('order_index');
     }
+
+    /**
+     * @Route("/{id}/delivered", name="order_delivered", methods={"PATCH"})
+     */
+    public function delivered(Request $request, Order $order, EntityManagerInterface $manager): Response
+    {
+        $token = $request->request->get('_token');
+        if (!$this->isCsrfTokenValid('delivered' . $order->getId(), $token)) {
+            $this->addFlash('error', 'Invalid CSRF token!');
+
+            return $this->redirectToRoute('order_index');
+        }
+
+        $order->setDeliverAt(new \DateTime());
+        $order->setStatus(Order::STATUS_DELIVERED);
+
+        $manager->persist($order);
+        $manager->flush();
+
+        return $this->redirectToRoute('order_index');
+    }
+
+
     /**
      * @Route("/{id}", name="order_delete", methods={"DELETE"})
      */

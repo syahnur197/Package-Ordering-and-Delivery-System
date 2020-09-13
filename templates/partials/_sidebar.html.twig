@@ -2,13 +2,23 @@
     <ul class="flex flex-col py-3 text-left">
         <li class="flex-1">
             <a href="{{ url('order_index') }}" class="block py-2 my-5 pl-4 hover:pl-6 align-middle no-underline text-gray-700 hover:text-gray-200 hover:bg-gray-500">
-                <span class="pb-0 text-lg font-semibold block inline-block">Orders</span>
+                <span class="pb-0 text-lg font-semibold inline-block">Orders</span>
             </a>
+
+            {% if app.user.isCustomer() or app.user.isAdmin() %}
             <a href="{{ url('product_index') }}" class="block py-2 my-5 pl-4 hover:pl-6 align-middle no-underline text-gray-700 hover:text-gray-200 hover:bg-gray-500">
-                <span class="pb-0 text-lg font-semibold block inline-block">Products</span>
+                <span class="pb-0 text-lg font-semibold inline-block">Products</span>
             </a>
+            {% endif %}
+
+            {% if app.user.isAdmin() %}
             <a href="#" class="block py-2 my-5 pl-4 hover:pl-6 align-middle no-underline text-gray-700 hover:text-gray-200 hover:bg-gray-500">
-                <span class="pb-0 text-lg font-semibold block inline-block">Drivers</span>
+              <span class="pb-0 text-lg font-semibold inline-block">Drivers</span>
+            </a>
+            {% endif %}
+
+            <a href="{{ url('app_logout') }}" class="block py-2 my-5 pl-4 hover:pl-6 align-middle no-underline text-gray-700 hover:text-gray-200 hover:bg-gray-500">
+              <span class="pb-0 text-lg font-semibold inline-block">Logout</span>
             </a>
         </li>
     </ul>

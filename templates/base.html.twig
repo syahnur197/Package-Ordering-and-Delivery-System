@@ -9,11 +9,27 @@
 </head>
 <body class="antialiased font-sans bg-gray-200">
   <div class="flex flex-row">
-    {{ include('partials/_sidebar.html.twig') }}
+    {% if app.user %}
+      {{ include('partials/_sidebar.html.twig') }}
+    {% endif %}
     <div class="main-content flex-1 mx-auto px-8 py-20">
       {% block body %}{% endblock %}
       {% block javascripts %}
-      {{ encore_entry_script_tags('app') }}
+        {{ encore_entry_script_tags('app') }}
+        <script>
+          document.addEventListener("DOMContentLoaded", function(event) {
+            setTimeout(removeAlerts, 5000)
+          });
+
+          function removeAlerts() {
+            let alerts = document.getElementsByClassName('alert');
+
+            for (let i = 0; i < alerts.length; i++) {
+              alerts[i].remove();
+            }
+          }
+
+        </script>
       {% endblock %}
     </div>
   </div>

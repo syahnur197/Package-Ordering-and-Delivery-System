@@ -5,7 +5,6 @@ namespace App\DataFixtures;
 use App\Entity\User;
 use Doctrine\Persistence\ObjectManager;
 use Doctrine\Bundle\FixturesBundle\Fixture;
-use Symfony\Component\Security\Core\Encoder\PasswordEncoderInterface;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class UserFixtures extends Fixture
@@ -55,6 +54,14 @@ class UserFixtures extends Fixture
             $driverObject->setRoleAsDriver();
             $manager->persist($driverObject);
         }
+
+        $customer = new User();
+        $customer->setUsername('customer');
+        $customer->setName('Customer');
+        $customer->setEmail('customer@email.com');
+        $customer->setPassword($this->encoder->encodePassword($driverObject, 'password'));
+        $customer->setRoleAsCustomer();
+        $manager->persist($customer);
 
         $manager->flush();
     }

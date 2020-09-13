@@ -4,6 +4,10 @@
 
 {% block body %}
 
+{% for message in app.flashes('error') %}
+  {% include "components/alerts/_error.html.twig" with {'title' : 'Danger!', 'message' : message} %}
+{% endfor %}
+
 <div>
   <h2 class="text-2xl font-semibold leading-tight">All Orders</h2>
 </div>
@@ -33,9 +37,11 @@
           <th class="{{ header_class }}">
             Status
           </th>
-          <th class="{{ header_class }}">
-            Action
-          </th>
+          {% if not app.user.isCustomer() %}
+            <th class="{{ header_class }}">
+              Action
+            </th>
+          {% endif %}
         </tr>
       </thead>
       <tbody>
@@ -81,10 +87,31 @@
               </span>
             </p>
           </td>
-          <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
-            <a class='text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded'
-              href="{{ path('order_edit', {'id': order.id}) }}">Process</a>
-          </td>
+          {% if app.user.isAdmin() %}
+            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+              {% if order.isPending() %}
+              <a class='text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded'
+                href="{{ url('order_edit', {'id': order.id}) }}">Process</a>
+              {% elseif order.isDelivered() %}
+                <button class='text-white bg-indigo-300 border-0 py-2 px-6 focus:outline-none rounded cursor-not-allowed'>Delivered</a>
+              {% else %}
+              <a class='text-white bg-indigo-300 border-0 py-2 px-6 focus:outline-none rounded cursor-not-allowed'
+                href="{{ url('order_edit', {'id': order.id}) }}">Process</a>
+              {% endif %}
+            </td>
+          {% elseif app.user.isDriver() %}
+            <td class="px-5 py-5 border-b border-gray-200 bg-white text-sm">
+              {% if order.isAccepted() %}
+                  <form action="{{ url('order_delivered', {'id': order.id}) }}" method="POST">
+                    <input type="hidden" name="_method" value="PATCH">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delivered' ~ order.id) }}">
+                    <button class='text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded'>Delivered</a>
+                  </form>
+              {% else %}
+                <button class='text-white bg-indigo-300 border-0 py-2 px-6 focus:outline-none rounded cursor-not-allowed'>Delivered</a>
+              {% endif %}
+            </td>
+          {% endif %}
         </tr>
         {% endfor %}
       </tbody>
