@@ -14,18 +14,21 @@
 
           <div class="grid grid-cols-12 gap-2 mb-4">
             <div class="col-span-2">
-              <label for="deliverer" class="text-base font-bold text-gray-800">Deliverer</label>
+              <label for="deliverer" class="text-lg font-bold text-gray-800">Deliverer</label>
             </div>
             <div class="col-span-10">
-              <select name="deliverer" id="" class="w-full border rounded-lg py-2">
-                <option value=""></option>
+              <select name="deliverer_id" id="deliverer_id" class="w-full border rounded-lg py-2">
+                <option value="">No deliverer selected</option>
+                {% for deliverer in deliverers %}
+                  <option value="{{deliverer.id}}" {{ deliverer.id == deliverers.0.id ? 'selected' : ''}}>{{ deliverer.name }}</option>
+                {% endfor %}
               </select>
             </div>
           </div>
 
-          <div class="grid grid-cols-12 gap-2">
+          <div class="grid grid-cols-12 gap-2 mb-4">
             <div class="col-span-2">
-              <label for="deliverer" class="text-base font-bold text-gray-800">Status</label>
+              <label for="deliverer" class="text-lg font-bold text-gray-800">Status</label>
               <input type="hidden" name="status" value="" id="status">
             </div>
             <div class="col-span-10">
@@ -40,8 +43,14 @@
             </div>
           </div>
 
-					<span class="text-gray-700 text-base font-semibold">Amount Paid:</span>
-					<span class="text-gray-800 text-base font-bold mb-2">{{ product.price }}</span>
+          <div class="grid grid-cols-12 gap-2 mb-8">
+            <div class="col-span-2">
+              <label for="deliverer" class="text-lg font-bold text-gray-800">Amount Paid:</label>
+            </div>
+            <div class="col-span-10 text-lg">
+              {{ product.price }}
+            </div>
+          </div>
 
 					<button class="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg">Update</button>
 				</div>
@@ -51,12 +60,13 @@
 {% endblock %}
 
 {% block javascripts %}
-
+{{ parent() }}
 <script>
   function clickButton(action) {
 
-    let status_accepted = {{ status_accepted }};
-    let status_rejected = {{ status_rejected }};
+    let status_accepted = '{{ status_accepted }}';
+    let status_rejected = '{{ status_rejected }}';
+    let first_driver_id = '{{ deliverers.0.id }}'
 
     let accept_action = 'accept';
     let reject_action = 'reject';
@@ -70,6 +80,8 @@
 
     let action_buttons = document.getElementsByClassName('action_button');
 
+    let deliverer_id_input = document.getElementById('deliverer_id');
+
     let status = document.getElementById('status');
 
     for(let i = 0; i < action_buttons.length; i++)
@@ -82,10 +94,14 @@
       accept_button.classList.remove(inactive_class);
       accept_button.classList.add(active_class);
       status.value = status_accepted;
+
+      deliverer_id_input.value = first_driver_id;
     } else if (action === reject_action) {
       reject_button.classList.remove(inactive_class);
       reject_button.classList.add(active_class);
       status.value = status_rejected;
+
+      deliverer_id_input.value = '';
     }
   }
 </script>

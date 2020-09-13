@@ -9,6 +9,7 @@ use App\Form\Order\ProcessOrderType;
 use App\Form\OrderType;
 use App\Repository\OrderRepository;
 use App\Repository\ProductRepository;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -70,7 +71,7 @@ class OrderController extends AbstractController
             $entityManager->persist($order);
             $entityManager->flush();
 
-            return $this->redirectToRoute('product');
+            return $this->redirectToRoute('product_index');
         }
 
         return $this->render('order/new.html.twig', [
@@ -93,12 +94,14 @@ class OrderController extends AbstractController
     /**
      * @Route("/{id}/edit", name="order_edit", methods={"GET","POST"})
      */
-    public function edit(Request $request, Order $order): Response
+    public function edit(Request $request, Order $order, UserRepository $userRepository): Response
     {
+        $deliverers = $userRepository->findByRole(User::ROLE_DRIVER);
 
         return $this->render('order/edit.html.twig', [
             'status_accepted' => Order::STATUS_ACCEPTED,
             'status_rejected' => Order::STATUS_REJECTED,
+            'deliverers' => $deliverers,
             'order' => $order,
             'product' => $order->getProduct(),
         ]);
