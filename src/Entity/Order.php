@@ -43,7 +43,7 @@ class Order
     private $id;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="orders")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="orders", fetch="EAGER")
      * @ORM\JoinColumn(nullable=false)
      */
     private $user;
@@ -80,7 +80,7 @@ class Order
     private $status = self::STATUS_PENDING;
 
     /**
-     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="deliveredOrders")
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="deliveredOrders", fetch="EAGER")
      */
     private $deliverer;
 
