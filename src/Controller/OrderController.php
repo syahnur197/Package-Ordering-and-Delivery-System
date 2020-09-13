@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Entity\Order;
+use App\Entity\Product;
+use App\Form\Order\ProcessOrderType;
 use App\Form\OrderType;
 use App\Repository\OrderRepository;
 use App\Repository\ProductRepository;
@@ -49,15 +51,14 @@ class OrderController extends AbstractController
     }
 
     /**
-     * @Route("/new/{product_id}", name="order_new", methods={"GET","POST"})
+     * @Route("/new/{product}", name="order_new", methods={"GET","POST"})
      */
-    public function new(Request $request, $product_id, EntityManagerInterface $entityManager, ProductRepository $productRepository): Response
+    public function new(Request $request, Product $product, EntityManagerInterface $entityManager): Response
     {
         $order = new Order();
         $form = $this->createForm(OrderType::class, $order);
         $form->handleRequest($request);
 
-        $product = $productRepository->find($product_id);
         if ($form->isSubmitted() && $form->isValid()) {
             $user = $this->getUser();
 
@@ -94,27 +95,30 @@ class OrderController extends AbstractController
      */
     public function edit(Request $request, Order $order): Response
     {
-        $form = $this->createForm(OrderType::class, $order);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $this->getDoctrine()->getManager()->flush();
-
-            return $this->redirectToRoute('order_index');
-        }
 
         return $this->render('order/edit.html.twig', [
+            'status_accepted' => Order::STATUS_ACCEPTED,
+            'status_rejected' => Order::STATUS_REJECTED,
             'order' => $order,
-            'form' => $form->createView(),
+            'product' => $order->getProduct(),
         ]);
     }
 
+    /**
+     * @Route("/{id}", name="order_update", methods={"PATCH"})
+     */
+    public function update(Request $request, Order $order): Response
+    {
+
+
+        return $this->redirectToRoute('order_index');
+    }
     /**
      * @Route("/{id}", name="order_delete", methods={"DELETE"})
      */
     public function delete(Request $request, Order $order): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$order->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $order->getId(), $request->request->get('_token'))) {
             $entityManager = $this->getDoctrine()->getManager();
             $entityManager->remove($order);
             $entityManager->flush();

@@ -1,13 +1,93 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Edit Order{% endblock %}
+{% block title %}Edit Order
+{% endblock %}
 
 {% block body %}
-    <h1>Edit Order</h1>
+	<section class="text-gray-700 body-font relative">
+		<form action="{{ url('order_update', {'id' : order.id }) }}" method="post">
+      <input type="hidden" name="token" value="{{ csrf_token('order_update') }}"/>
+      <input type="hidden" name="_method" value="PATCH"/>
+			<div class="px-5 py-24 mx-auto flex sm:flex-no-wrap flex-wrap">
+        <div class="bg-white p-4 rounded-lg shadow-xl flex flex-col md:ml-auto w-1/2 mx-auto md:py-8 mt-8 md:mt-0">
+          <h2 class="text-gray-900 text-2xl font-medium title-font mb-8">Process Order</h2>
 
-    {{ include('order/_form.html.twig', {'button_label': 'Update'}) }}
+          <div class="grid grid-cols-12 gap-2 mb-4">
+            <div class="col-span-2">
+              <label for="deliverer" class="text-base font-bold text-gray-800">Deliverer</label>
+            </div>
+            <div class="col-span-10">
+              <select name="deliverer" id="" class="w-full border rounded-lg py-2">
+                <option value=""></option>
+              </select>
+            </div>
+          </div>
 
-    <a href="{{ path('order_index') }}">back to list</a>
+          <div class="grid grid-cols-12 gap-2">
+            <div class="col-span-2">
+              <label for="deliverer" class="text-base font-bold text-gray-800">Status</label>
+              <input type="hidden" name="status" value="" id="status">
+            </div>
+            <div class="col-span-10">
+              <div class="inline-flex">
+                <button type="button" id="accept_button" class="action_button bg-gray-300 hover:bg-gray-500 text-gray-800 font-bold py-2 px-4 rounded-l" onclick="clickButton('accept')">
+                  Accept
+                </button>
+                <button type="button" id="reject_button" class="action_button bg-gray-300 hover:bg-gray-500 text-gray-800 font-bold py-2 px-4 rounded-r" onclick="clickButton('reject')">
+                  Reject
+                </button>
+              </div>
+            </div>
+          </div>
 
-    {{ include('order/_delete_form.html.twig') }}
+					<span class="text-gray-700 text-base font-semibold">Amount Paid:</span>
+					<span class="text-gray-800 text-base font-bold mb-2">{{ product.price }}</span>
+
+					<button class="text-white bg-indigo-500 border-0 py-2 px-6 focus:outline-none hover:bg-indigo-600 rounded text-lg">Update</button>
+				</div>
+			</div>
+		</form>
+	</section>
+{% endblock %}
+
+{% block javascripts %}
+
+<script>
+  function clickButton(action) {
+
+    let status_accepted = {{ status_accepted }};
+    let status_rejected = {{ status_rejected }};
+
+    let accept_action = 'accept';
+    let reject_action = 'reject';
+
+    let inactive_class = "bg-gray-300";
+    let active_class = "bg-gray-500";
+
+    let accept_button = document.getElementById('accept_button');
+
+    let reject_button = document.getElementById('reject_button');
+
+    let action_buttons = document.getElementsByClassName('action_button');
+
+    let status = document.getElementById('status');
+
+    for(let i = 0; i < action_buttons.length; i++)
+    {
+      action_buttons[i].classList.remove(active_class);
+      action_buttons[i].classList.add(inactive_class);
+    }
+
+    if (action === accept_action) {
+      accept_button.classList.remove(inactive_class);
+      accept_button.classList.add(active_class);
+      status.value = status_accepted;
+    } else if (action === reject_action) {
+      reject_button.classList.remove(inactive_class);
+      reject_button.classList.add(active_class);
+      status.value = status_rejected;
+    }
+  }
+</script>
+
 {% endblock %}
